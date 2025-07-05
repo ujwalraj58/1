@@ -1,37 +1,48 @@
-from django.http import JsonResponse
 import json
-import os
+from django.http import JsonResponse
 from .langchain_rag import get_answer
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from .rag_pdf import answer_from_pdf
 
 def home(request):
     return render(request, "test_chat.html")
+
+@csrf_exempt
+def ask_pdf(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        question = data.get("question", "")
+        try:
+            response = answer_from_pdf(question)
+            return JsonResponse({'response': response})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 @csrf_exempt
 def chat(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            message = data.get("message", "")
-            if not message:
-                return JsonResponse({'error': 'No message provided'}, status=400)
+            question = data.get("message", "").strip()
 
-            print("🟡 Asking:", message)
-            response_obj = get_answer(message)
+            if not question:
+                return JsonResponse({"error": "No message provided"}, status=400)
 
-            # Handle both content and string return types
-            response_text = response_obj.content if hasattr(response_obj, "content") else str(response_obj)
+            answer_obj = get_answer(question)
 
-            print("🟢 Answer:", response_text)
-            return JsonResponse({'response': response_text})
+            # Handle LangChain output
+            answer_text = answer_obj.content if hasattr(answer_obj, "content") else str(answer_obj)
+
+            return JsonResponse({"response": answer_text})
 
         except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({"error": str(e)}, status=500)
 
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
+    return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
 def ask_question(request):
     # --- TEMPORARY DEBUG PRINT ---
