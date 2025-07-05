@@ -11,9 +11,26 @@ def home(request):
 @csrf_exempt
 def chat(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        message = data.get("message", "")
-        return JsonResponse({'response': f"You said: {message}"})
+        try:
+            data = json.loads(request.body)
+            message = data.get("message", "")
+            if not message:
+                return JsonResponse({'error': 'No message provided'}, status=400)
+
+            print("🟡 Asking:", message)
+            response_obj = get_answer(message)
+
+            # Handle both content and string return types
+            response_text = response_obj.content if hasattr(response_obj, "content") else str(response_obj)
+
+            print("🟢 Answer:", response_text)
+            return JsonResponse({'response': response_text})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 def ask_question(request):
