@@ -8,6 +8,7 @@ import os
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ask/', include('chatbot.urls')),
+    path('chat/', include('chatbot.urls')),
     path("", home, name="home"),
 ]
 

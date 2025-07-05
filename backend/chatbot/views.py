@@ -1,13 +1,33 @@
 import json
 from django.http import JsonResponse
-from .langchain_rag import get_answer
+from .langchain_rag import handle_user_query
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.crypto import get_random_string
 from .rag_pdf import answer_from_pdf
 from .rag_from_uploaded import get_answer_from_file
+from .langchain_rag import create_vectorstore_from_pdf, handle_user_query
+
+retriever = create_vectorstore_from_pdf("chatbot/static/data/AI Chatbot for Student Assistance.pdf")
 
 def home(request):
     return render(request, "test_chat.html")
+
+@csrf_exempt
+def chat_api(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            user_input = body.get("message")
+            session_id = body.get("session_id", get_random_string(12))
+
+            response = handle_user_query(user_input, retriever, session_id)
+
+            return JsonResponse({"response": response, "session_id": session_id})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"message": "Send a POST request with 'message'."})
 
 @csrf_exempt
 def upload_file_and_ask(request):
@@ -55,7 +75,7 @@ def chat(request):
             if not question:
                 return JsonResponse({"error": "No message provided"}, status=400)
 
-            answer_obj = get_answer(question)
+            answer_obj = handle_user_query(question)
 
             # Handle LangChain output
             answer_text = answer_obj.content if hasattr(answer_obj, "content") else str(answer_obj)
@@ -82,7 +102,7 @@ def ask_question(request):
                 return JsonResponse({'error': 'No question provided'}, status=400)
 
             print("🟡 Incoming question:", question)
-            answer_object = get_answer(question)
+            answer_object = handle_user_query(question)
 
             if hasattr(answer_object, 'content'):
                 answer_text = answer_object.content
