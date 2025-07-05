@@ -10,10 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 def chat(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        message = data.get('message')
-        answer = get_answer(message)
+        question = data.get('message',"")
+        answer = "You asked " + question
         return JsonResponse({'answer': answer})
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    return JsonResponse({'error': 'Invalid request'}, status=405)
 
 def index(request):
     file_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'index.html')
