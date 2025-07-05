@@ -10,25 +10,28 @@ def home(request):
     return render(request, "test_chat.html")
 
 @csrf_exempt
-def upload_file(request):
+def upload_file_and_ask(request):
     if request.method == 'POST':
-        uploaded_file = request.FILES.get('file')
-        if not uploaded_file:
-            return JsonResponse({'error': 'No file uploaded'}, status=400)
+        file = request.FILES.get('file')
+        question = request.POST.get('question')
 
-        file_path = default_storage.save(f"uploaded/{uploaded_file.name}", uploaded_file)
+        if not file or not question:
+            return JsonResponse({'error': 'File and question required'}, status=400)
 
+        # Save the uploaded file temporarily
+        file_path = os.path.join("temp", file.name)
+        with open(file_path, 'wb+') as dest:
+            for chunk in file.chunks():
+                dest.write(chunk)
+
+        # Process the file using your RAG function
         try:
-            question = request.POST.get('question', '')
-            if not question:
-                return JsonResponse({'error': 'No question provided'}, status=400)
-
-            answer = get_answer_from_file(file_path, question)
+            answer = process_pdf_with_rag(file_path, question)
             return JsonResponse({'answer': answer})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @csrf_exempt
 def ask_pdf(request):
