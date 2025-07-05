@@ -9,12 +9,10 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def chat(request):
     if request.method == 'POST':
-        return JsonResponse({'response': 'Hello from chatbot!'})
+        data = json.loads(request.body)
+        message = data.get("message", "")
+        return JsonResponse({'response': f"You said: {message}"})
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
-
-def index(request):
-    file_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'index.html')
-    return FileResponse(open(file_path, 'rb'))
 
 def ask_question(request):
     # --- TEMPORARY DEBUG PRINT ---
