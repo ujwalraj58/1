@@ -1,0 +1,67 @@
+####################################
+# Python / Django
+####################################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+myenv/
+env/
+venv/
+.myenv/
+.myvenv/
+
+# Environment files
+.env
+
+# Django-specific
+db.sqlite3
+/media/
+/staticfiles/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+
+####################################
+# Node.js / React / Vite
+####################################
+# Node modules
+node_modules/
+
+# Vite build output
+dist/
+
+# npm/yarn lock files (optional)
+package-lock.json
+yarn.lock
+
+# Local dev server
+.vite/
+
+# Vite cache
+.cache/
+*.local
+
+# dotenv files
+.env.*
+!.env.example
+
+####################################
+# System / Editor Files
+####################################
+.DS_Store
+.vscode/
+*.swp
+*.swo
+
+####################################
+# FAISS or RAG
+####################################
+*.faiss
+*.index

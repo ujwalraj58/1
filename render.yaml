@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: student-assistant-chatbot
+    runtime: python
+    # Build command now includes Vite build steps
+    # It first installs npm dependencies in 'frontend', then builds the React app (to 'dist'),
+    # then installs python dependencies in 'backend', collects static files, and runs migrations.
+    buildCommand: "npm install --prefix frontend && npm run build --prefix frontend && pip install -r backend/requirements.txt && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate"
+    # Start command assumes manage.py is in 'backend' directory
+    startCommand: "gunicorn backend.chatbot_project.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.settings
+      - key: DJANGO_DEBUG
+        value: "False" # Set to "True" for debugging, "False" for production on Render
+      # IMPORTANT: Add your OpenRouter API Key here in Render's dashboard as a secret environment variable
+      # - key: OPENROUTER_API_KEY
+      #   value: your_openrouter_api_key_here
