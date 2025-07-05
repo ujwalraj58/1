@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from chatbot.views import home
 from django.conf import settings
 from django.conf.urls.static import static
 import os
@@ -7,6 +8,7 @@ import os
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ask/', include('chatbot.urls')),
+    path("", home, name="home"),
 ]
 
 if settings.DEBUG:
