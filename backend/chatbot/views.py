@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 import json
+import os
 from .langchain_rag import get_answer
 from django.shortcuts import render
 
 def index(request):
-    return render(request, "index.html")
+    file_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'index.html')
+    return FileResponse(open(file_path, 'rb'))
 
 def ask_question(request):
     # --- TEMPORARY DEBUG PRINT ---
