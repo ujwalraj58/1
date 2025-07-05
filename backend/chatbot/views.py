@@ -1,6 +1,10 @@
 from django.http import JsonResponse
 import json
 from .langchain_rag import get_answer
+from django.shortcuts import render
+
+def index(request):
+    return render(request, "index.html")
 
 def ask_question(request):
     # --- TEMPORARY DEBUG PRINT ---
