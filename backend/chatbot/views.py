@@ -8,8 +8,6 @@ from .rag_pdf import answer_from_pdf
 from .rag_from_uploaded import get_answer_from_file
 from .langchain_rag import create_vectorstore_from_pdf, handle_user_query
 
-retriever = create_vectorstore_from_pdf("chatbot/static/data/AI Chatbot for Student Assistance.pdf")
-
 def home(request):
     return render(request, "test_chat.html")
 
@@ -17,6 +15,7 @@ def home(request):
 def chat_api(request):
     if request.method == "POST":
         try:
+            retriever = create_vectorstore_from_pdf("chatbot/static/data/AI Chatbot for Student Assistance.pdf")
             body = json.loads(request.body)
             user_input = body.get("message")
             session_id = body.get("session_id", get_random_string(12))

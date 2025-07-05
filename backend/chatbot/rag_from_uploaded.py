@@ -1,10 +1,17 @@
 import os
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.llms import OpenAI
+
+pdf_path = "chatbot/static/data/AI Chatbot for Student Assistance.pdf"
+
+if not os.path.exists(pdf_path):
+    raise FileNotFoundError(f"File not found: {pdf_path}")
+
+loader = PyPDFLoader(pdf_path)
 
 def get_answer_from_file(file_path, question):
     if not file_path.endswith(".pdf"):
