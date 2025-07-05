@@ -7,6 +7,7 @@ import os
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('chatbot.urls')),
+    path('ask/', include('chatbot.urls')),
 ]
 
 if settings.DEBUG:
