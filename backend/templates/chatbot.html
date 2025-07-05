@@ -118,14 +118,26 @@
             <!-- Messages will be appended here -->
             <div class="message bot-message">Hello! How can I help you today?</div>
         </div>
-        <form id="chat-form" action="/ask/" method="post" class="chat-input-area">
-            {% csrf_token %} <!-- THIS IS CRUCIAL: Django template tag to include the CSRF token -->
-            <input type="text" id="user-input" class="chat-input" placeholder="Type your message...">
-            <button type="submit" id="send-button" class="send-button">Send</button>
-        </form>
-    </div>
+            <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" name="file" required />
+            <input type="text" name="question" placeholder="Ask something..." required />
+            <button type="submit">Upload & Ask</button>
+            </form>
+        </div>
 
     <script>
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const response = await fetch('/api/upload/', {
+            method: 'POST',
+            body: formData
+            });
+
+            const data = await response.json();
+            alert(data.answer || data.error);
+         });
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const chatMessages = document.getElementById('chat-messages');
