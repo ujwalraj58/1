@@ -30,7 +30,7 @@ def get_qa_chain(retriever: VectorStoreRetriever) -> RetrievalQA:
     llm = ChatOpenAI(
         temperature=0,
         openai_api_key=OPENAI_API_KEY,
-        model_name="gpt-3.5-turbo"
+        model_name="mistralai/mistral-7b-instruct:free"
     )
     return RetrievalQA.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True)
 
