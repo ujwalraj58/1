@@ -2,6 +2,8 @@
 from django.urls import path
 from .views import ask_question, index
 from django.views.generic import TemplateView
+from . import views
+
 
 urlpatterns = [
     # CRITICAL CHANGE: This path should be an empty string.
