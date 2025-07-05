@@ -4,9 +4,31 @@ from .langchain_rag import get_answer
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from .rag_pdf import answer_from_pdf
+from .rag_from_uploaded import get_answer_from_file
 
 def home(request):
     return render(request, "test_chat.html")
+
+@csrf_exempt
+def upload_file(request):
+    if request.method == 'POST':
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
+            return JsonResponse({'error': 'No file uploaded'}, status=400)
+
+        file_path = default_storage.save(f"uploaded/{uploaded_file.name}", uploaded_file)
+
+        try:
+            question = request.POST.get('question', '')
+            if not question:
+                return JsonResponse({'error': 'No question provided'}, status=400)
+
+            answer = get_answer_from_file(file_path, question)
+            return JsonResponse({'answer': answer})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Only POST method allowed'}, status=405)
 
 @csrf_exempt
 def ask_pdf(request):
